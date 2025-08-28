@@ -38,6 +38,7 @@
 #include <QSettings>
 #include <QAction>
 #include <QDir>
+#include <QRegularExpression>
 #include <QTimer>
 #include <QApplication>
 #include <QDesktopServices>
@@ -1100,16 +1101,15 @@ QList<BtnDynamicInfo *> NumpadManager::readBtnsDynamicInfo(QString fileName)
         str = stream.readLine();
         QList<int> ids;
         QString word;
-        QRegExp rx;
-        rx.setPattern("(\".+\")");
-        int pos = rx.indexIn(str);
-        if (pos != -1)
+        QRegularExpression rx("(\".+\")");
+        QRegularExpressionMatch match = rx.match(str);
+        int pos = -1;
+        if (match.hasMatch())
         {
-            word = rx.cap(1);
-            pos += rx.matchedLength();
+            word = match.captured(1);
+            pos = match.capturedEnd();
             QString unsupSym;
-            word = word.remove(0, 1);
-            word = word.remove(word.size() - 1, 1);
+            word = word.mid(1, word.size() - 2);
             ids = strToIds(word, unsupSym);
             if (!unsupSym.isEmpty())
             {
@@ -1117,48 +1117,45 @@ QList<BtnDynamicInfo *> NumpadManager::readBtnsDynamicInfo(QString fileName)
                 m_isConfErr = true;
             }
             if (ids.isEmpty())
-            {                
+            {
                 continue;
             }
         }
         else
         {
             rx.setPattern("(ALT.+ALT)");
-            pos = rx.indexIn(str);
-            if (pos != -1)
+            match = rx.match(str);
+            pos = match.hasMatch() ? match.capturedStart() : -1;
+            if (match.hasMatch())
             {
-                QString word = rx.cap(1);
+                QString word = match.captured(1);
                 QList<int> codes;
-                pos = 0;
-                rx.setPattern("(\\d+)");
-                while ((pos = rx.indexIn(word, pos)) != -1)
+                QRegularExpression digitRx("(\\d+)");
+                QRegularExpressionMatchIterator it = digitRx.globalMatch(word);
+                while (it.hasNext())
                 {
-                    codes << rx.cap(1).toInt();
-                    pos += rx.matchedLength();
+                    QRegularExpressionMatch m = it.next();
+                    codes << m.captured(1).toInt();
                 }
-                rx.setPattern("(UNI.+UNI)");
-                pos = rx.indexIn(str);
-                if (pos != -1)
+                QRegularExpression uniRx("(UNI.+UNI)");
+                QRegularExpressionMatch uniMatch = uniRx.match(str);
+                if (uniMatch.hasMatch())
                 {
-                    QString view = rx.cap(1);
-                    pos += rx.matchedLength();
-                    view = view.remove(0, 3);
-                    view = view.remove(view.size() - 3, 3);
+                    QString view = uniMatch.captured(1);
+                    pos = uniMatch.capturedEnd();
+                    view = view.mid(3, view.size() - 6);
                     m_btnsStInfo[curStInfoIndex] = new BtnStaticInfo(view, true, codes);
                     ids << curStInfoIndex;
                     ++curStInfoIndex;
                 }
             }
         }
-        rx.setPattern("(\\d+)");
+        QRegularExpression digitRx("(\\d+)");
         QStringList list;
-        if (pos == -1)
-        {
-            pos = 0;
-        }
-        while ((pos = rx.indexIn(str, pos)) != -1) {
-            list << rx.cap(1);
-            pos += rx.matchedLength();
+        QRegularExpressionMatchIterator it = digitRx.globalMatch(str, pos == -1 ? 0 : pos);
+        while (it.hasNext()) {
+            QRegularExpressionMatch m = it.next();
+            list << m.captured(1);
         }
         QString confRec(word + " ");
         for (int i = 0; i < list.size(); ++i)

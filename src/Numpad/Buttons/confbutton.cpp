@@ -95,7 +95,7 @@ void ConfButton::mousePressEvent(QMouseEvent *event)
 
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
-    drag->setPixmap(QPixmap::grabWidget(this));
+    drag->setPixmap(this->grab());
     drag->setHotSpot(event->pos());
 
     BtnShape shape = m_dyInfo->shape;

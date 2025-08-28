@@ -112,7 +112,7 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   p_spacingLayout->addStretch(1);
   
   QFontMetrics font = QFontMetrics(p_buttonsSizeLbl->font());
-  int sizeGrpWidth = font.width("Buttons size");
+  int sizeGrpWidth = font.horizontalAdvance("Buttons size");
   p_buttonsSizeLbl->setFixedWidth(sizeGrpWidth);
   p_spacingLbl->setFixedWidth(sizeGrpWidth);
   p_buttonsSizeSlider->setFixedWidth(sizeGrpWidth * 2);

@@ -36,7 +36,7 @@ void SourceButton::mousePressEvent(QMouseEvent *event)
 
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
-    drag->setPixmap(QPixmap::grabWidget(this));
+    drag->setPixmap(this->grab());
     drag->setHotSpot(event->pos());
 
     drag->exec(Qt::MoveAction, Qt::MoveAction);
