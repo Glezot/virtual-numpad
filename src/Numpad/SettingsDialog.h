@@ -47,10 +47,11 @@ protected slots:
   void slot_altCodeLblModeStateChanged(int);
   void slot_autoRunStateChanged(int);
   void slot_buttonsSizeSliderReleased();
-  void slot_spacingSliderReleased(); 
-  void slot_confBtnClicked(); 
+  void slot_spacingSliderReleased();
+  void slot_confBtnClicked();
   void slot_showGearStateChanged(int);
-  void slot_openConfFileClicked();  
+  void slot_showLayoutBtnStateChanged(int);
+  void slot_openConfFileClicked();
   void slot_loadOtherConfBtnClicked();
 
 private:

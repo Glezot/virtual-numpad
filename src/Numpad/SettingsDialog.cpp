@@ -57,6 +57,14 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   QGroupBox *p_showGearGrpBox = new QGroupBox;
   p_showGearGrpBox->setLayout(p_showGearLayout);
 
+  QCheckBox *p_showLayoutBtnCheckBox = new QCheckBox("Show layout switch button");
+  p_showLayoutBtnCheckBox->setChecked(pm_numpadManager->readLayoutBtnVisibleFromSettings());
+  QHBoxLayout *p_layoutBtnLayout = new QHBoxLayout;
+  p_layoutBtnLayout->addWidget(p_showLayoutBtnCheckBox);
+  p_layoutBtnLayout->addStretch(1);
+  QGroupBox *p_layoutBtnGrpBox = new QGroupBox;
+  p_layoutBtnGrpBox->setLayout(p_layoutBtnLayout);
+
   QCheckBox *p_autoRunCheckBox = new QCheckBox("Autorun with Windows");
   p_autoRunCheckBox->setChecked(pm_numpadManager->isAutoRunSet());
 
@@ -172,6 +180,7 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   
   QVBoxLayout *p_mainLayout = new QVBoxLayout;
   p_mainLayout->addWidget(p_showGearGrpBox);
+  p_mainLayout->addWidget(p_layoutBtnGrpBox);
   p_mainLayout->addWidget(p_autoRunGrpBox);
   p_mainLayout->addWidget(p_keyGroupBox);
   p_mainLayout->addWidget(p_sizesGrpBox); 
@@ -199,9 +208,11 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
           SLOT(slot_buttonsSizeSliderReleased()));
   connect(p_spacingSlider, SIGNAL(sliderReleased()),
           SLOT(slot_spacingSliderReleased()));  
-  connect(p_confBtn, SIGNAL(clicked()), SLOT(slot_confBtnClicked()));  
+  connect(p_confBtn, SIGNAL(clicked()), SLOT(slot_confBtnClicked()));
   connect(p_showGearCheckBox, SIGNAL(stateChanged(int)),
           SLOT(slot_showGearStateChanged(int)));
+  connect(p_showLayoutBtnCheckBox, SIGNAL(stateChanged(int)),
+          SLOT(slot_showLayoutBtnStateChanged(int)));
   connect(p_openConfFileFolderBtn, SIGNAL(clicked()), SLOT(slot_openConfFileClicked()));
   connect(p_loadOtherConfBtn, SIGNAL(clicked()), SLOT(slot_loadOtherConfBtnClicked()));
 
@@ -373,6 +384,12 @@ void SettingsDialog::slot_loadOtherConfBtnClicked()
 void SettingsDialog::slot_showGearStateChanged(int state)
 {
     pm_numpadManager->setMenuVisible(state);
+}
+
+
+void SettingsDialog::slot_showLayoutBtnStateChanged(int state)
+{
+    pm_numpadManager->setLayoutBtnVisible(state == Qt::Checked);
 }
 
 

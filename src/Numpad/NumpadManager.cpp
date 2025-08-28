@@ -98,6 +98,8 @@ NumpadManager::NumpadManager(QWidget *p_parent/*= 0*/)
 
   loadBtnsStaticInfo();
 
+  m_layoutBtnVisible = readLayoutBtnVisibleFromSettings();
+
   createNumpad();
   
   pm_systemTray->show();
@@ -778,6 +780,26 @@ bool NumpadManager::readMenuVisibleFromSettings()
 }
 
 
+void NumpadManager::setLayoutBtnVisible(bool visible)
+{
+    m_layoutBtnVisible = visible;
+    writeLayoutBtnVisibleToSettings(visible);
+    slot_reloadConfig();
+}
+
+
+void NumpadManager::writeLayoutBtnVisibleToSettings(bool visible)
+{
+    pm_settings->setValue("/Settings/LayoutBtnVisible", visible);
+}
+
+
+bool NumpadManager::readLayoutBtnVisibleFromSettings()
+{
+    return pm_settings->value("/Settings/LayoutBtnVisible", true).toBool();
+}
+
+
 void NumpadManager::checkConfFile()
 {
     wchar_t path[MAX_PATH];
@@ -1208,7 +1230,15 @@ QList<BtnDynamicInfo *> NumpadManager::readBtnsDynamicInfo(QString fileName)
         column--;
         btnsDyInfo << new BtnDynamicInfo(ids, shape, row, column);
     }
-    confFile.close();    
+    confFile.close();
+    for (int i = btnsDyInfo.size() - 1; i >= 0; --i)
+    {
+        if (btnsDyInfo[i]->ids.contains(165))
+        {
+            delete btnsDyInfo[i];
+            btnsDyInfo.removeAt(i);
+        }
+    }
     return btnsDyInfo;
 }
 
@@ -1259,20 +1289,26 @@ QList<BtnDynamicInfo *>  NumpadManager::loadStandardNmpdInfo()
     btnsDyInfo << new BtnDynamicInfo(QList<int>() << 66, Sqr, 0, 2);
     btnsDyInfo << new BtnDynamicInfo(QList<int>() << 67, Sqr, 0, 1);
     btnsDyInfo << new BtnDynamicInfo(QList<int>() << 68, Sqr, 0, 0);
-    btnsDyInfo << new BtnDynamicInfo(QList<int>() << 165, Sqr, 4, 3);
     return btnsDyInfo;
 }
 
 
-QList<BtnDynamicInfo *> NumpadManager::getCurrentBtnsConfig()
+QList<BtnDynamicInfo *> NumpadManager::getCurrentBtnsConfig(bool includeLayoutBtn)
 {
-    return readBtnsDynamicInfo(fullConfFileName);
+    QList<BtnDynamicInfo *> info = readBtnsDynamicInfo(fullConfFileName);
+    if (includeLayoutBtn && m_layoutBtnVisible)
+    {
+        info << new BtnDynamicInfo(QList<int>() << 165, Sqr, 4, 3);
+    }
+    return info;
 }
 
 
 QList<BtnDynamicInfo *> NumpadManager::getAllBtnsConfig()
 {
-    return readBtnsDynamicInfo(":/Examples/All buttons/" + confFileName);
+    QList<BtnDynamicInfo *> info = readBtnsDynamicInfo(":/Examples/All buttons/" + confFileName);
+    info << new BtnDynamicInfo(QList<int>() << 165, Sqr, 9, 4);
+    return info;
 }
 
 
@@ -1313,7 +1349,11 @@ void NumpadManager::applyVisualConfig(QList<BtnDynamicInfo *> _btnsDyInfo)
     }
     for (int i = 0; i < _btnsDyInfo.size(); ++i)
     {
-        BtnDynamicInfo *di = _btnsDyInfo[i];        
+        BtnDynamicInfo *di = _btnsDyInfo[i];
+        if (di->ids.contains(165))
+        {
+            continue;
+        }
         if (di->ids.size() == 1)
         {
             int id = di->ids[0];
@@ -1409,9 +1449,20 @@ int NumpadManager::addNewBtnInfo(QString altCode, QString unicode)
 
 void NumpadManager::toggleLayout()
 {
+    int x = pm_numpad->pos().x();
+    int y = pm_numpad->pos().y();
+    int prevWidth = pm_numpad->width();
     confFileName = (confFileName == numericConfFileName) ? qwertyConfFileName : numericConfFileName;
     checkConfFile();
     slot_reloadConfig();
+    if (confFileName == qwertyConfFileName)
+    {
+        pm_numpad->move(x - pm_numpad->width(), y);
+    }
+    else
+    {
+        pm_numpad->move(x + prevWidth, y);
+    }
 }
 
 
