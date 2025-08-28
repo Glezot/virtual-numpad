@@ -1452,17 +1452,15 @@ void NumpadManager::toggleLayout()
     int x = pm_numpad->pos().x();
     int y = pm_numpad->pos().y();
     int prevWidth = pm_numpad->width();
+    int prevHeight = pm_numpad->height();
     confFileName = (confFileName == numericConfFileName) ? qwertyConfFileName : numericConfFileName;
     checkConfFile();
     slot_reloadConfig();
-    if (confFileName == qwertyConfFileName)
-    {
-        pm_numpad->move(x - pm_numpad->width(), y);
-    }
-    else
-    {
-        pm_numpad->move(x + prevWidth, y);
-    }
+
+    // keep the bottom-right corner anchored when switching layouts
+    int newX = x + prevWidth - pm_numpad->width();
+    int newY = y + prevHeight - pm_numpad->height();
+    pm_numpad->move(newX, newY);
 }
 
 
