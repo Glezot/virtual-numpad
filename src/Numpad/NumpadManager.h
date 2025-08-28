@@ -69,10 +69,13 @@ public:
   void setMenuVisible(bool);
   void writeMenuVisibleToSettings(bool);
   bool readMenuVisibleFromSettings();
+  void setLayoutBtnVisible(bool);
+  void writeLayoutBtnVisibleToSettings(bool);
+  bool readLayoutBtnVisibleFromSettings();
   void openConfFileFolder(); 
   void loadOtherConfig();
   QMap<int,BtnStaticInfo *> & getBtnsStInfo() { return m_btnsStInfo; }
-  QList<BtnDynamicInfo *> getCurrentBtnsConfig();
+  QList<BtnDynamicInfo *> getCurrentBtnsConfig(bool includeLayoutBtn = true);
   QList<BtnDynamicInfo *> getAllBtnsConfig();
   void applyVisualConfig(QList<BtnDynamicInfo *>);
   void dndNumClose();
@@ -113,7 +116,7 @@ private:
   void checkExamples();
   void loadBtnsStaticInfo();
   QList<BtnDynamicInfo *> readBtnsDynamicInfo(QString);
-  QList<BtnDynamicInfo *> loadStandardNmpdInfo();  
+  QList<BtnDynamicInfo *> loadStandardNmpdInfo();
   int getVirtCode(int);
 
   Numpad *pm_numpad;
@@ -158,6 +161,7 @@ private:
   AllBtnWidget *allBtnWid;
   const int lastStInfoIndex;
   int curStInfoIndex;
+  bool m_layoutBtnVisible;
 };
 
 #endif
