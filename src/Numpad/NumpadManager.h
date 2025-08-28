@@ -80,6 +80,7 @@ public:
   QList<int> strToIds(QString, QString &);
   void showHelp(const QString &);
   int addNewBtnInfo(QString, QString);
+  void toggleLayout();
 
 protected:
   // The method for processing native events from the OS in Qt
@@ -145,6 +146,8 @@ private:
   QString version;
   QString appName;
   QString confFileName;
+  QString numericConfFileName;
+  QString qwertyConfFileName;
   QString confFileCommonPath;
   QString fullConfFileName;
   HelpWindow *helpWindow;

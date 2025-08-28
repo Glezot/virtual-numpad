@@ -365,6 +365,11 @@ void Numpad::slot_btnPressed(QList<int> ids)
 {
     for (int i = 0; i < ids.size(); ++i)
     {
+        if (ids[i] == 165)
+        {
+            nm->toggleLayout();
+            return;
+        }
         bool useAltCode = nm->getBtnsStInfo()[ids[i]]->useAltCode;
         QList<int> codes = nm->getBtnsStInfo()[ids[i]]->codes;
         if (!useAltCode)
