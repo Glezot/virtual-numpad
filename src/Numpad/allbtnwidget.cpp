@@ -9,8 +9,8 @@
 #include <QList>
 #include <QMenu>
 #include <QMouseEvent>
-#include <QRegExp>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 
 AllBtnWidget::AllBtnWidget(NumpadManager *_nm, QWidget *_parent)
@@ -41,13 +41,13 @@ AllBtnWidget::AllBtnWidget(NumpadManager *_nm, QWidget *_parent)
     gridLayout->addWidget(helpLbl, 0, 12, 1, 8);
     altCodeLineEdit = new QLineEdit;
     altCodeLineEdit->setPlaceholderText("Alt code");
-    QRegExp altCodeRX("\\d{1,4}");
-    QValidator *altCodeVal = new QRegExpValidator(altCodeRX, this);
+    QRegularExpression altCodeRX("\\d{1,4}");
+    QValidator *altCodeVal = new QRegularExpressionValidator(altCodeRX, this);
     altCodeLineEdit->setValidator(altCodeVal);
     unicodeLineEdit = new QLineEdit;
     unicodeLineEdit->setPlaceholderText("Unicode");
-    QRegExp unicodeRX("[0-9A-Fa-f]{1,4}");
-    QValidator *unicodeVal = new QRegExpValidator(unicodeRX, this);
+    QRegularExpression unicodeRX("[0-9A-Fa-f]{1,4}");
+    QValidator *unicodeVal = new QRegularExpressionValidator(unicodeRX, this);
     unicodeLineEdit->setValidator(unicodeVal);
     QPushButton *crAltCodeBtn = new QPushButton("Create special symbol");
     connect(crAltCodeBtn, SIGNAL(clicked()), SLOT(slot_crAltCodeBtnClicked()));
