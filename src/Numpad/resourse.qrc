@@ -2,7 +2,8 @@
 <qresource>
   <file>numpad_icon.png</file>
   <file>gear.png</file>
-  <file>NumpadConfig.txt</file>  
+  <file>NumpadConfig.txt</file>
+  <file>QwertyConfig.txt</file>
   <file>Examples/All buttons/NumpadConfig.txt</file>
   <file>Examples/Any text/NumpadConfig.txt</file>
   <file>Examples/Phone/NumpadConfig.txt</file>

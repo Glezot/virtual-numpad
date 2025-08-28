@@ -58,11 +58,13 @@
 #pragma comment(lib, "Shell32.lib")
 
 NumpadManager::NumpadManager(QWidget *p_parent/*= 0*/)
-: QWidget(p_parent), lastStInfoIndex(164), curStInfoIndex(lastStInfoIndex + 1)
+: QWidget(p_parent), lastStInfoIndex(165), curStInfoIndex(lastStInfoIndex + 1)
 {
     version = "1.8.0";
     appName = "Numpad_" + version;
-    confFileName = "NumpadConfig.txt";
+    numericConfFileName = "NumpadConfig.txt";
+    qwertyConfFileName = "QwertyConfig.txt";
+    confFileName = numericConfFileName;
     checkConfFile();
     checkExamples();
 
@@ -1018,44 +1020,45 @@ void NumpadManager::loadBtnsStaticInfo()
     m_btnsStInfo[123] = new BtnStaticInfo("&#x25BA;", false, QList<int>() << VK_RIGHT);
     m_btnsStInfo[124] = new BtnStaticInfo("ctrl", false, QList<int>() << VK_CONTROL);
     m_btnsStInfo[125] = new BtnStaticInfo("shift", false, QList<int>() << VK_SHIFT);
-    m_btnsStInfo[127] = new BtnStaticInfo("0 key", false, QList<int>() << 0x30);
-    m_btnsStInfo[128] = new BtnStaticInfo("1 key", false, QList<int>() << 0x31);
-    m_btnsStInfo[129] = new BtnStaticInfo("2 key", false, QList<int>() << 0x32);
-    m_btnsStInfo[130] = new BtnStaticInfo("3 key", false, QList<int>() << 0x33);
-    m_btnsStInfo[131] = new BtnStaticInfo("4 key", false, QList<int>() << 0x34);
-    m_btnsStInfo[132] = new BtnStaticInfo("5 key", false, QList<int>() << 0x35);
-    m_btnsStInfo[133] = new BtnStaticInfo("6 key", false, QList<int>() << 0x36);
-    m_btnsStInfo[134] = new BtnStaticInfo("7 key", false, QList<int>() << 0x37);
-    m_btnsStInfo[135] = new BtnStaticInfo("8 key", false, QList<int>() << 0x38);
-    m_btnsStInfo[136] = new BtnStaticInfo("9 key", false, QList<int>() << 0x39);
-    m_btnsStInfo[137] = new BtnStaticInfo("A key", false, QList<int>() << 0x41);
-    m_btnsStInfo[138] = new BtnStaticInfo("B key", false, QList<int>() << 0x42);
-    m_btnsStInfo[139] = new BtnStaticInfo("C key", false, QList<int>() << 0x43);
-    m_btnsStInfo[140] = new BtnStaticInfo("D key", false, QList<int>() << 0x44);
-    m_btnsStInfo[141] = new BtnStaticInfo("E key", false, QList<int>() << 0x45);
-    m_btnsStInfo[142] = new BtnStaticInfo("F key", false, QList<int>() << 0x46);
-    m_btnsStInfo[143] = new BtnStaticInfo("G key", false, QList<int>() << 0x47);
-    m_btnsStInfo[144] = new BtnStaticInfo("H key", false, QList<int>() << 0x48);
-    m_btnsStInfo[145] = new BtnStaticInfo("I key", false, QList<int>() << 0x49);
-    m_btnsStInfo[146] = new BtnStaticInfo("J key", false, QList<int>() << 0x4A);
-    m_btnsStInfo[147] = new BtnStaticInfo("K key", false, QList<int>() << 0x4B);
-    m_btnsStInfo[148] = new BtnStaticInfo("L key", false, QList<int>() << 0x4C);
-    m_btnsStInfo[149] = new BtnStaticInfo("M key", false, QList<int>() << 0x4D);
-    m_btnsStInfo[150] = new BtnStaticInfo("N key", false, QList<int>() << 0x4E);
-    m_btnsStInfo[151] = new BtnStaticInfo("O key", false, QList<int>() << 0x4F);
-    m_btnsStInfo[152] = new BtnStaticInfo("P key", false, QList<int>() << 0x50);
-    m_btnsStInfo[153] = new BtnStaticInfo("Q key", false, QList<int>() << 0x51);
-    m_btnsStInfo[154] = new BtnStaticInfo("R key", false, QList<int>() << 0x52);
-    m_btnsStInfo[155] = new BtnStaticInfo("S key", false, QList<int>() << 0x53);
-    m_btnsStInfo[156] = new BtnStaticInfo("T key", false, QList<int>() << 0x54);
-    m_btnsStInfo[157] = new BtnStaticInfo("U key", false, QList<int>() << 0x55);
-    m_btnsStInfo[158] = new BtnStaticInfo("V key", false, QList<int>() << 0x56);
-    m_btnsStInfo[159] = new BtnStaticInfo("W key", false, QList<int>() << 0x57);
-    m_btnsStInfo[160] = new BtnStaticInfo("X key", false, QList<int>() << 0x58);
-    m_btnsStInfo[161] = new BtnStaticInfo("Y key", false, QList<int>() << 0x59);
-    m_btnsStInfo[162] = new BtnStaticInfo("Z key", false, QList<int>() << 0x5A);
+    m_btnsStInfo[127] = new BtnStaticInfo("0", false, QList<int>() << 0x30);
+    m_btnsStInfo[128] = new BtnStaticInfo("1", false, QList<int>() << 0x31);
+    m_btnsStInfo[129] = new BtnStaticInfo("2", false, QList<int>() << 0x32);
+    m_btnsStInfo[130] = new BtnStaticInfo("3", false, QList<int>() << 0x33);
+    m_btnsStInfo[131] = new BtnStaticInfo("4", false, QList<int>() << 0x34);
+    m_btnsStInfo[132] = new BtnStaticInfo("5", false, QList<int>() << 0x35);
+    m_btnsStInfo[133] = new BtnStaticInfo("6", false, QList<int>() << 0x36);
+    m_btnsStInfo[134] = new BtnStaticInfo("7", false, QList<int>() << 0x37);
+    m_btnsStInfo[135] = new BtnStaticInfo("8", false, QList<int>() << 0x38);
+    m_btnsStInfo[136] = new BtnStaticInfo("9", false, QList<int>() << 0x39);
+    m_btnsStInfo[137] = new BtnStaticInfo("A", false, QList<int>() << 0x41);
+    m_btnsStInfo[138] = new BtnStaticInfo("B", false, QList<int>() << 0x42);
+    m_btnsStInfo[139] = new BtnStaticInfo("C", false, QList<int>() << 0x43);
+    m_btnsStInfo[140] = new BtnStaticInfo("D", false, QList<int>() << 0x44);
+    m_btnsStInfo[141] = new BtnStaticInfo("E", false, QList<int>() << 0x45);
+    m_btnsStInfo[142] = new BtnStaticInfo("F", false, QList<int>() << 0x46);
+    m_btnsStInfo[143] = new BtnStaticInfo("G", false, QList<int>() << 0x47);
+    m_btnsStInfo[144] = new BtnStaticInfo("H", false, QList<int>() << 0x48);
+    m_btnsStInfo[145] = new BtnStaticInfo("I", false, QList<int>() << 0x49);
+    m_btnsStInfo[146] = new BtnStaticInfo("J", false, QList<int>() << 0x4A);
+    m_btnsStInfo[147] = new BtnStaticInfo("K", false, QList<int>() << 0x4B);
+    m_btnsStInfo[148] = new BtnStaticInfo("L", false, QList<int>() << 0x4C);
+    m_btnsStInfo[149] = new BtnStaticInfo("M", false, QList<int>() << 0x4D);
+    m_btnsStInfo[150] = new BtnStaticInfo("N", false, QList<int>() << 0x4E);
+    m_btnsStInfo[151] = new BtnStaticInfo("O", false, QList<int>() << 0x4F);
+    m_btnsStInfo[152] = new BtnStaticInfo("P", false, QList<int>() << 0x50);
+    m_btnsStInfo[153] = new BtnStaticInfo("Q", false, QList<int>() << 0x51);
+    m_btnsStInfo[154] = new BtnStaticInfo("R", false, QList<int>() << 0x52);
+    m_btnsStInfo[155] = new BtnStaticInfo("S", false, QList<int>() << 0x53);
+    m_btnsStInfo[156] = new BtnStaticInfo("T", false, QList<int>() << 0x54);
+    m_btnsStInfo[157] = new BtnStaticInfo("U", false, QList<int>() << 0x55);
+    m_btnsStInfo[158] = new BtnStaticInfo("V", false, QList<int>() << 0x56);
+    m_btnsStInfo[159] = new BtnStaticInfo("W", false, QList<int>() << 0x57);
+    m_btnsStInfo[160] = new BtnStaticInfo("X", false, QList<int>() << 0x58);
+    m_btnsStInfo[161] = new BtnStaticInfo("Y", false, QList<int>() << 0x59);
+    m_btnsStInfo[162] = new BtnStaticInfo("Z", false, QList<int>() << 0x5A);
     m_btnsStInfo[163] = new BtnStaticInfo(".", true, QList<int>() << VK_NUMPAD4 << VK_NUMPAD6);
     m_btnsStInfo[164] = new BtnStaticInfo(" ", false, QList<int>() << VK_SPACE);
+    m_btnsStInfo[165] = new BtnStaticInfo("layout", false, QList<int>());
 }
 
 
@@ -1264,6 +1267,7 @@ QList<BtnDynamicInfo *>  NumpadManager::loadStandardNmpdInfo()
     btnsDyInfo << new BtnDynamicInfo(QList<int>() << 66, Sqr, 0, 2);
     btnsDyInfo << new BtnDynamicInfo(QList<int>() << 67, Sqr, 0, 1);
     btnsDyInfo << new BtnDynamicInfo(QList<int>() << 68, Sqr, 0, 0);
+    btnsDyInfo << new BtnDynamicInfo(QList<int>() << 165, Sqr, 4, 3);
     return btnsDyInfo;
 }
 
@@ -1408,6 +1412,14 @@ int NumpadManager::addNewBtnInfo(QString altCode, QString unicode)
     m_btnsStInfo[curStInfoIndex] = new BtnStaticInfo(view, true, codes);
     ++curStInfoIndex;
     return curStInfoIndex - 1;
+}
+
+
+void NumpadManager::toggleLayout()
+{
+    confFileName = (confFileName == numericConfFileName) ? qwertyConfFileName : numericConfFileName;
+    checkConfFile();
+    slot_reloadConfig();
 }
 
 
