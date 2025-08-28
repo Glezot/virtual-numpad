@@ -1076,7 +1076,8 @@ void NumpadManager::loadBtnsStaticInfo()
     m_btnsStInfo[162] = new BtnStaticInfo("Z", false, QList<int>() << 0x5A);
     m_btnsStInfo[163] = new BtnStaticInfo(".", true, QList<int>() << VK_NUMPAD4 << VK_NUMPAD6);
     m_btnsStInfo[164] = new BtnStaticInfo(" ", false, QList<int>() << VK_SPACE);
-    m_btnsStInfo[165] = new BtnStaticInfo("layout", false, QList<int>());
+    QString layoutLabel = (confFileName == numericConfFileName) ? "abc" : "123";
+    m_btnsStInfo[165] = new BtnStaticInfo(layoutLabel, false, QList<int>());
 }
 
 
@@ -1454,6 +1455,7 @@ void NumpadManager::toggleLayout()
     int prevWidth = pm_numpad->width();
     int prevHeight = pm_numpad->height();
     confFileName = (confFileName == numericConfFileName) ? qwertyConfFileName : numericConfFileName;
+    m_btnsStInfo[165]->view = (confFileName == numericConfFileName) ? "abc" : "123";
     checkConfFile();
     slot_reloadConfig();
 
