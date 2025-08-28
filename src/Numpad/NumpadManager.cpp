@@ -59,7 +59,7 @@
 #pragma comment(lib, "Shell32.lib")
 
 NumpadManager::NumpadManager(QWidget *p_parent/*= 0*/)
-: QWidget(p_parent), lastStInfoIndex(165), curStInfoIndex(lastStInfoIndex + 1)
+: QWidget(p_parent), lastStInfoIndex(169), curStInfoIndex(lastStInfoIndex + 1)
 {
     version = "1.8.0";
     appName = "Numpad_" + version;
@@ -1077,6 +1077,10 @@ void NumpadManager::loadBtnsStaticInfo()
     m_btnsStInfo[163] = new BtnStaticInfo(".", true, QList<int>() << VK_NUMPAD4 << VK_NUMPAD6);
     m_btnsStInfo[164] = new BtnStaticInfo(" ", false, QList<int>() << VK_SPACE);
     m_btnsStInfo[165] = new BtnStaticInfo("layout", false, QList<int>());
+    m_btnsStInfo[166] = new BtnStaticInfo("Ñ", false, QList<int>() << VK_OEM_1);
+    m_btnsStInfo[167] = new BtnStaticInfo(",", false, QList<int>() << VK_OEM_COMMA);
+    m_btnsStInfo[168] = new BtnStaticInfo(".", false, QList<int>() << VK_OEM_PERIOD);
+    m_btnsStInfo[169] = new BtnStaticInfo("-", false, QList<int>() << VK_OEM_MINUS);
 }
 
 
