@@ -33,7 +33,7 @@
 #include <QColor>
 #include <QString>
 #include <QCursor>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QFontMetrics>
 #include <QSettings>
 #include <QAction>
@@ -476,15 +476,9 @@ void NumpadManager::slot_numpadSettings()
 
 void NumpadManager::slot_configure()
 {
-    int minSide;
-    if (QApplication::desktop()->height() < QApplication::desktop()->width())
-    {
-        minSide = QApplication::desktop()->height();
-    }
-    else
-    {
-        minSide = QApplication::desktop()->width();
-    }
+    QScreen *screen = QApplication::primaryScreen();
+    int minSide = screen->geometry().height() < screen->geometry().width()
+            ? screen->geometry().height() : screen->geometry().width();
     if (!allBtnWid)
     {
         allBtnWid = new AllBtnWidget(this);
@@ -630,8 +624,9 @@ void NumpadManager::showHideNumpadThroPressKey()
   }
   else
   {
-    int widthScreen = QApplication::desktop()->width();
-    int heightScreen = QApplication::desktop()->height();
+    QScreen *screen = QApplication::primaryScreen();
+    int widthScreen = screen->geometry().width();
+    int heightScreen = screen->geometry().height();
     int xCenter =  widthScreen / 2;
     int yCenter =  heightScreen / 2;
     int xCursor = QCursor::pos().x();

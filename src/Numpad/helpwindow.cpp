@@ -3,7 +3,7 @@
 #include <QVBoxLayout>
 #include <Windows.h>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 
 
 HelpWindow::HelpWindow(QWidget *parent)
@@ -14,15 +14,9 @@ HelpWindow::HelpWindow(QWidget *parent)
     QFont font = textBrowser->font();
     font.setPixelSize(14);
     textBrowser->setFont(font);
-    int minSide;
-    if (QApplication::desktop()->height() < QApplication::desktop()->width())
-    {
-        minSide = QApplication::desktop()->height();
-    }
-    else
-    {
-        minSide = QApplication::desktop()->width();
-    }
+    QScreen *screen = QApplication::primaryScreen();
+    int minSide = screen->geometry().height() < screen->geometry().width()
+            ? screen->geometry().height() : screen->geometry().width();
     setMinimumHeight(minSide / 2);
     setMinimumWidth(minSide / 2);
 

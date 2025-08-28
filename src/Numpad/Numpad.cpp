@@ -31,7 +31,6 @@
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QDesktopWidget>
 #include <QLabel>
 #include <QTimer>
 #include <ctime>
@@ -41,6 +40,9 @@
 #include <QSet>
 #include <WindowsX.h>
 #include <QMenuBar>
+#include <QAction>
+#include <QIcon>
+#include <QScreen>
 
 
 #pragma comment(lib,"kernel32.lib")
@@ -65,13 +67,13 @@ Numpad::Numpad(NumpadManager *_nm, QWidget *p_wid/*= 0*/)
   QHBoxLayout *p_middleLayout = new QHBoxLayout;
   p_middleLayout->addWidget(pm_buttonsBox);
   p_middleLayout->addStretch(1);
-  p_middleLayout->setMargin(0);
+  p_middleLayout->setContentsMargins(0, 0, 0, 0);
    
   QVBoxLayout *p_mainLayout = new QVBoxLayout;
 
   p_mainLayout->addLayout(p_middleLayout);
   p_mainLayout->addStretch(1);
-  p_mainLayout->setMargin(0);
+  p_mainLayout->setContentsMargins(0, 0, 0, 0);
    
   setLayout(p_mainLayout);
 
@@ -86,7 +88,8 @@ Numpad::Numpad(NumpadManager *_nm, QWidget *p_wid/*= 0*/)
 
   m_minButtonsSize = 20;
   
-  m_maxButtonsSize = QApplication::desktop()->height() / 7;  
+  QScreen *screen = QApplication::primaryScreen();
+  m_maxButtonsSize = screen->geometry().height() / 7;
 
   pm_altCodeLbl = NULL;
 
@@ -226,7 +229,8 @@ void Numpad::setButtonsSize(int size, bool correctFontSizeMode)
 
   correctAltCodeLblFontSize();
 
-  pm_gridLayout->setMargin(m_buttonsSize / 20);
+  int margin = m_buttonsSize / 20;
+  pm_gridLayout->setContentsMargins(margin, margin, margin, margin);
 
   if (correctFontSizeMode)
   {
