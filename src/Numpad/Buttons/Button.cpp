@@ -97,14 +97,13 @@ void Button::setStyles()
 
 void Button::mousePressEvent(QMouseEvent *)
 {
-    setPressedView();    
-
-    emit pressed(m_ids);
+    setPressedView();
     m_pressed = true;
-    if (m_autoRepeated)
+    if (m_autoRepeated && pm_delayTimer)
     {
         pm_delayTimer->start(m_autoRepeatDelay);
     }
+    emit pressed(m_ids);
 }
 
 
@@ -160,10 +159,10 @@ void Button::setAutoRepeat(bool mode)
     {
         if (!pm_delayTimer)
         {
-            pm_delayTimer = new QTimer();
+            pm_delayTimer = new QTimer(this);
             connect(pm_delayTimer, SIGNAL(timeout()),
                     this, SLOT(delayTimeout()));
-            pm_intervalTimer = new QTimer();
+            pm_intervalTimer = new QTimer(this);
             connect(pm_intervalTimer, SIGNAL(timeout()),
                     this, SLOT(intervalTimeout()));
         }
