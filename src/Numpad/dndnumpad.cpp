@@ -68,7 +68,7 @@ DndNumpad::~DndNumpad()
 void DndNumpad::createButtons()
 {
     const int capacity = 100;
-    QList<BtnDynamicInfo *> btnsDyInfo = nm->getCurrentBtnsConfig(false);
+    QList<BtnDynamicInfo *> btnsDyInfo = nm->getCurrentBtnsConfig(true);
     if (btnsDyInfo.size() == 0)
     {
         rowTop = 0;
