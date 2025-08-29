@@ -1271,14 +1271,6 @@ QList<BtnDynamicInfo *> NumpadManager::readBtnsDynamicInfo(QString fileName)
         btnsDyInfo << new BtnDynamicInfo(ids, shape, row, column);
     }
     confFile.close();
-    for (int i = btnsDyInfo.size() - 1; i >= 0; --i)
-    {
-        if (btnsDyInfo[i]->ids.contains(165))
-        {
-            delete btnsDyInfo[i];
-            btnsDyInfo.removeAt(i);
-        }
-    }
     return btnsDyInfo;
 }
 
@@ -1338,7 +1330,19 @@ QList<BtnDynamicInfo *> NumpadManager::getCurrentBtnsConfig(bool includeLayoutBt
     QList<BtnDynamicInfo *> info = readBtnsDynamicInfo(fullConfFileName);
     if (includeLayoutBtn && m_layoutBtnVisible)
     {
-        info << new BtnDynamicInfo(QList<int>() << 165, Sqr, 4, 3);
+        bool hasLayoutBtn = false;
+        for (int i = 0; i < info.size(); ++i)
+        {
+            if (info[i]->ids.contains(165))
+            {
+                hasLayoutBtn = true;
+                break;
+            }
+        }
+        if (!hasLayoutBtn)
+        {
+            info << new BtnDynamicInfo(QList<int>() << 165, Sqr, 4, 3);
+        }
     }
     return info;
 }
@@ -1347,7 +1351,19 @@ QList<BtnDynamicInfo *> NumpadManager::getCurrentBtnsConfig(bool includeLayoutBt
 QList<BtnDynamicInfo *> NumpadManager::getAllBtnsConfig()
 {
     QList<BtnDynamicInfo *> info = readBtnsDynamicInfo(":/Examples/All buttons/AllButtonsConfig.txt");
-    info << new BtnDynamicInfo(QList<int>() << 165, Sqr, 9, 4);
+    bool hasLayoutBtn = false;
+    for (int i = 0; i < info.size(); ++i)
+    {
+        if (info[i]->ids.contains(165))
+        {
+            hasLayoutBtn = true;
+            break;
+        }
+    }
+    if (!hasLayoutBtn)
+    {
+        info << new BtnDynamicInfo(QList<int>() << 165, Sqr, 9, 4);
+    }
     return info;
 }
 
@@ -1390,10 +1406,6 @@ void NumpadManager::applyVisualConfig(QList<BtnDynamicInfo *> _btnsDyInfo)
     for (int i = 0; i < _btnsDyInfo.size(); ++i)
     {
         BtnDynamicInfo *di = _btnsDyInfo[i];
-        if (di->ids.contains(165))
-        {
-            continue;
-        }
         if (di->ids.size() == 1)
         {
             int id = di->ids[0];
