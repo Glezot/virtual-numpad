@@ -824,7 +824,38 @@ void NumpadManager::checkConfFile()
                     | QFile::WriteGroup | QFile::WriteOther;
             confFile.setPermissions(perm);
         }
-    }   
+        else if (confFileName == qwertyConfFileName)
+        {
+            QFile confFile(fullConfFileName);
+            if (confFile.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QString content = QString::fromUtf8(confFile.readAll());
+                confFile.close();
+                int requiredIds[] = {166, 167, 168, 169};
+                bool needUpdate = false;
+                for (int i = 0; i < 4; ++i)
+                {
+                    QRegularExpression re(QString("\\b%1\\b").arg(requiredIds[i]));
+                    if (!re.match(content).hasMatch())
+                    {
+                        needUpdate = true;
+                        break;
+                    }
+                }
+                if (needUpdate)
+                {
+                    QFile::remove(fullConfFileName);
+                    QFile embedConfFile(":/" + confFileName);
+                    embedConfFile.copy(fullConfFileName);
+                    QFile newConfFile(fullConfFileName);
+                    QFile::Permissions perm = newConfFile.permissions();
+                    perm = perm | QFile::WriteOwner | QFile::WriteUser
+                            | QFile::WriteGroup | QFile::WriteOther;
+                    newConfFile.setPermissions(perm);
+                }
+            }
+        }
+    }
 }
 
 
