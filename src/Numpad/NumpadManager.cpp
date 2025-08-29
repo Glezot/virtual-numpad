@@ -835,13 +835,15 @@ void NumpadManager::checkExamples()
                  << "Numpad with Alt" << "Numpad with arrows";
     for (int i = 0; i < exampleNames.size(); ++i)
     {
+        QString fileName = (exampleNames[i] == "All buttons") ?
+                           "AllButtonsConfig.txt" : confFileName;
         QString examplePath = confFileCommonPath + "/Examples/" + exampleNames[i];
-        QString fullExampleName = examplePath + "/" + confFileName;
+        QString fullExampleName = examplePath + "/" + fileName;
         if (!QFile::exists(fullExampleName))
         {
             QDir dir;
             dir.mkpath(examplePath);
-            QFile embedFile(":/Examples/" + exampleNames[i] + "/" + confFileName);
+            QFile embedFile(":/Examples/" + exampleNames[i] + "/" + fileName);
             embedFile.copy(fullExampleName);
             QFile confFile(fullExampleName);
             QFile::Permissions perm = confFile.permissions();
@@ -1313,7 +1315,7 @@ QList<BtnDynamicInfo *> NumpadManager::getCurrentBtnsConfig(bool includeLayoutBt
 
 QList<BtnDynamicInfo *> NumpadManager::getAllBtnsConfig()
 {
-    QList<BtnDynamicInfo *> info = readBtnsDynamicInfo(":/Examples/All buttons/" + confFileName);
+    QList<BtnDynamicInfo *> info = readBtnsDynamicInfo(":/Examples/All buttons/AllButtonsConfig.txt");
     info << new BtnDynamicInfo(QList<int>() << 165, Sqr, 9, 4);
     return info;
 }
