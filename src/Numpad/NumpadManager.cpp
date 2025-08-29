@@ -1112,7 +1112,7 @@ void NumpadManager::loadBtnsStaticInfo()
   
     QString layoutLabel = (confFileName == numericConfFileName) ? "abc" : "123";
     m_btnsStInfo[165] = new BtnStaticInfo(layoutLabel, false, QList<int>());
-    m_btnsStInfo[166] = new BtnStaticInfo("Ñ", false, QList<int>() << VK_OEM_1);
+    m_btnsStInfo[166] = new BtnStaticInfo("Ñ", true, QList<int>() << VK_NUMPAD0 << VK_NUMPAD2 << VK_NUMPAD0 << VK_NUMPAD9);
     m_btnsStInfo[167] = new BtnStaticInfo(",", false, QList<int>() << VK_OEM_COMMA);
     m_btnsStInfo[168] = new BtnStaticInfo(".", false, QList<int>() << VK_OEM_PERIOD);
     m_btnsStInfo[169] = new BtnStaticInfo("-", false, QList<int>() << VK_OEM_MINUS);
