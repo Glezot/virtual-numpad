@@ -1062,7 +1062,7 @@ void NumpadManager::loadBtnsStaticInfo()
     m_btnsStInfo[114] = new BtnStaticInfo("pause", false, QList<int>() << VK_PAUSE);
     m_btnsStInfo[115] = new BtnStaticInfo("home", false, QList<int>() << VK_HOME);
     m_btnsStInfo[116] = new BtnStaticInfo("end", false, QList<int>() << VK_END);
-    m_btnsStInfo[117] = new BtnStaticInfo("dlt", false, QList<int>() << VK_DELETE);
+    m_btnsStInfo[117] = new BtnStaticInfo("supr", false, QList<int>() << VK_DELETE);
     m_btnsStInfo[118] = new BtnStaticInfo("page<br>up", false, QList<int>() << VK_PRIOR);
     m_btnsStInfo[119] = new BtnStaticInfo("page<br>down", false, QList<int>() << VK_NEXT);
     m_btnsStInfo[120] = new BtnStaticInfo("&#x25B2;", false, QList<int>() << VK_UP);
