@@ -93,6 +93,9 @@ public:
   void writeInitialPositionToSettings(const QPoint &pos);
   void applyInitialPosition(const QPoint &pos);
 
+public slots:
+  void bringToForeground();
+
 protected:
   // The method for processing native events from the OS in Qt
   bool nativeEvent(const QByteArray &eventType, void *message, long *result);

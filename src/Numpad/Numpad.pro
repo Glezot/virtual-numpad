@@ -7,6 +7,7 @@ INCLUDEPATH += . Buttons
 QT += core
 QT += gui
 QT += widgets
+QT += network
 
 
 # Input
@@ -26,7 +27,8 @@ HEADERS += AboutWindow.h \
     Buttons/confbutton.h \
     btninfo.h \
     Buttons/sourcebutton.h \
-    allbtnwidget.h
+    allbtnwidget.h \
+    SingleInstanceGuard.h
 
            
 SOURCES += AboutWindow.cpp \
@@ -43,7 +45,8 @@ SOURCES += AboutWindow.cpp \
     dndnumpad.cpp \
     Buttons/confbutton.cpp \
     Buttons/sourcebutton.cpp \
-    allbtnwidget.cpp
+    allbtnwidget.cpp \
+    SingleInstanceGuard.cpp
 
 
 RESOURCES += resourse.qrc
