@@ -27,6 +27,7 @@
 #include <Windows.h>
 #include <QVector>
 #include <QMap>
+#include <QMoveEvent>
 
 class Button;
 class BigVerticalButton;
@@ -75,8 +76,9 @@ protected:
   // The method for processing native events from the OS in Qt
   bool nativeEvent(const QByteArray &eventType, void *message, long *result);
   void paintEvent(QPaintEvent *);
-  void hideEvent(QHideEvent *);  
+  void hideEvent(QHideEvent *);
   void closeEvent(QCloseEvent *);
+  void moveEvent(QMoveEvent *event) override;
 
 protected slots:
   void slot_btnToggled(int id, bool checked);

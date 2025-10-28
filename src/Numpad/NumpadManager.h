@@ -26,6 +26,7 @@
 #include <vector>
 #include <Windows.h>
 #include <QMap>
+#include <QPoint>
 #include "btninfo.h"
 
 class SettingsDialog;
@@ -84,6 +85,8 @@ public:
   void showHelp(const QString &);
   int addNewBtnInfo(QString, QString);
   void toggleLayout();
+  void writeNumpadPosition(const QPoint &pos);
+  QPoint readNumpadPosition() const;
 
 protected:
   // The method for processing native events from the OS in Qt
