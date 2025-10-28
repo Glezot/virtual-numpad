@@ -548,7 +548,7 @@ void Numpad::moveEvent(QMoveEvent *event)
     QWidget::moveEvent(event);
     if (nm)
     {
-        nm->writeNumpadPosition(event->pos());
+        nm->writeNumpadPosition(pos());
     }
 }
 

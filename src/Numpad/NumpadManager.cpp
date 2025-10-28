@@ -44,6 +44,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QPoint>
 #include <Shlobj.h>
 #include <QFile>
 #include <QFileDialog>
@@ -812,30 +813,98 @@ void NumpadManager::writeNumpadPosition(const QPoint &pos)
 QPoint NumpadManager::readNumpadPosition() const
 {
     const int defaultCoord = 200;
-    const QPoint stored(pm_settings->value("/Settings/xPr", defaultCoord).toInt(),
-                        pm_settings->value("/Settings/yPr", defaultCoord).toInt());
+    const QPoint defaultPoint(defaultCoord, defaultCoord);
+    const QPoint stored = readStoredNumpadPosition(defaultPoint);
+    const QPoint custom = readInitialPositionFromSettings();
+    const bool rememberLast = readRememberLastPositionFromSettings();
+    const QPoint candidate = rememberLast ? stored : custom;
+    const QPoint fallback = rememberLast ? custom : stored;
 
+    return validatePosition(candidate, fallback);
+}
+
+
+bool NumpadManager::readRememberLastPositionFromSettings() const
+{
+    return pm_settings->value("/Settings/RememberLastPosition", true).toBool();
+}
+
+
+void NumpadManager::writeRememberLastPositionToSettings(bool remember)
+{
+    pm_settings->setValue("/Settings/RememberLastPosition", remember);
+    pm_settings->sync();
+}
+
+
+QPoint NumpadManager::readInitialPositionFromSettings() const
+{
+    const int defaultCoord = 200;
+    return QPoint(pm_settings->value("/Settings/InitialX", defaultCoord).toInt(),
+                  pm_settings->value("/Settings/InitialY", defaultCoord).toInt());
+}
+
+
+void NumpadManager::writeInitialPositionToSettings(const QPoint &pos)
+{
+    pm_settings->setValue("/Settings/InitialX", pos.x());
+    pm_settings->setValue("/Settings/InitialY", pos.y());
+    pm_settings->sync();
+}
+
+
+void NumpadManager::applyInitialPosition(const QPoint &pos)
+{
+    if (!pm_numpad)
+    {
+        return;
+    }
+
+    const int defaultCoord = 200;
+    const QPoint defaultPoint(defaultCoord, defaultCoord);
+    const QPoint validated = validatePosition(pos, defaultPoint);
+    pm_numpad->move(validated);
+}
+
+
+QPoint NumpadManager::readStoredNumpadPosition(const QPoint &fallback) const
+{
+    return QPoint(pm_settings->value("/Settings/xPr", fallback.x()).toInt(),
+                  pm_settings->value("/Settings/yPr", fallback.y()).toInt());
+}
+
+
+QPoint NumpadManager::validatePosition(const QPoint &candidate, const QPoint &fallback) const
+{
     const QList<QScreen *> screens = QGuiApplication::screens();
     if (screens.isEmpty())
     {
-        return stored;
+        return candidate;
     }
 
     for (QScreen *screen : screens)
     {
-        if (screen && screen->availableGeometry().contains(stored))
+        if (screen && screen->availableGeometry().contains(candidate))
         {
-            return stored;
+            return candidate;
+        }
+    }
+
+    for (QScreen *screen : screens)
+    {
+        if (screen && screen->availableGeometry().contains(fallback))
+        {
+            return fallback;
         }
     }
 
     QScreen *primaryScreen = QGuiApplication::primaryScreen();
-    if (!primaryScreen)
+    if (primaryScreen)
     {
-        return stored;
+        return primaryScreen->availableGeometry().topLeft();
     }
 
-    return primaryScreen->availableGeometry().topLeft();
+    return candidate;
 }
 
 
