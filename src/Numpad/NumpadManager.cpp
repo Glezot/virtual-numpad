@@ -34,6 +34,7 @@
 #include <QString>
 #include <QCursor>
 #include <QScreen>
+#include <QGuiApplication>
 #include <QFontMetrics>
 #include <QSettings>
 #include <QAction>
@@ -185,8 +186,10 @@ NumpadManager::~NumpadManager()
     delete *iter;
     iter++;
   }
-  pm_settings->setValue("/Settings/xPr", pm_numpad->pos().x());
-  pm_settings->setValue("/Settings/yPr", pm_numpad->pos().y());
+  if (pm_numpad)
+  {
+      writeNumpadPosition(pm_numpad->pos());
+  }
   delete pm_numpad;
 
   QList<BtnStaticInfo *> list = m_btnsStInfo.values();
@@ -270,9 +273,7 @@ void NumpadManager::createNumpad()
 
   pm_numpad->setMenuVisible(readMenuVisibleFromSettings());
 
-  int xPrev = pm_settings->value("/Settings/xPr", 200).toInt();
-  int yPrev = pm_settings->value("/Settings/yPr", 200).toInt();
-  pm_numpad->move(xPrev, yPrev);
+  pm_numpad->move(readNumpadPosition());
 }
 
 ////////////////////////////////////////////////////////////////////////////////  
@@ -797,6 +798,44 @@ void NumpadManager::writeLayoutBtnVisibleToSettings(bool visible)
 bool NumpadManager::readLayoutBtnVisibleFromSettings()
 {
     return pm_settings->value("/Settings/LayoutBtnVisible", true).toBool();
+}
+
+
+void NumpadManager::writeNumpadPosition(const QPoint &pos)
+{
+    pm_settings->setValue("/Settings/xPr", pos.x());
+    pm_settings->setValue("/Settings/yPr", pos.y());
+    pm_settings->sync();
+}
+
+
+QPoint NumpadManager::readNumpadPosition() const
+{
+    const int defaultCoord = 200;
+    const QPoint stored(pm_settings->value("/Settings/xPr", defaultCoord).toInt(),
+                        pm_settings->value("/Settings/yPr", defaultCoord).toInt());
+
+    const QList<QScreen *> screens = QGuiApplication::screens();
+    if (screens.isEmpty())
+    {
+        return stored;
+    }
+
+    for (QScreen *screen : screens)
+    {
+        if (screen && screen->availableGeometry().contains(stored))
+        {
+            return stored;
+        }
+    }
+
+    QScreen *primaryScreen = QGuiApplication::primaryScreen();
+    if (!primaryScreen)
+    {
+        return stored;
+    }
+
+    return primaryScreen->availableGeometry().topLeft();
 }
 
 

@@ -43,6 +43,7 @@
 #include <QAction>
 #include <QIcon>
 #include <QScreen>
+#include <QMoveEvent>
 
 
 #pragma comment(lib,"kernel32.lib")
@@ -530,8 +531,19 @@ void Numpad::slot_showAltCodeLblTimeout()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Numpad::moveEvent(QMoveEvent *event)
+{
+    QWidget::moveEvent(event);
+    if (nm)
+    {
+        nm->writeNumpadPosition(event->pos());
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void Numpad::initAltCodesList()
-{    
+{
     m_altCodes << "<center>alt 1 alt</center>"
                   "<center>&#x263A;</center>"
                << "<center>alt 2 alt</center>"
