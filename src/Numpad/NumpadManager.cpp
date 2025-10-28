@@ -65,7 +65,7 @@
 NumpadManager::NumpadManager(QWidget *p_parent/*= 0*/)
 : QWidget(p_parent), lastStInfoIndex(169), curStInfoIndex(lastStInfoIndex + 1)
 {
-    version = "1.8.0";
+    version = "1.9.0";
     appName = "Numpad_" + version;
     numericConfFileName = "NumpadConfig.txt";
     qwertyConfFileName = "QwertyConfig.txt";
