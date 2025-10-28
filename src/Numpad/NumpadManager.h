@@ -131,6 +131,7 @@ private:
   int getVirtCode(int);
   QPoint readStoredNumpadPosition(const QPoint &fallback) const;
   QPoint validatePosition(const QPoint &candidate, const QPoint &fallback) const;
+  bool hasStoredNumpadPosition() const;
 
   Numpad *pm_numpad;
   QSystemTrayIcon *pm_systemTray;  
