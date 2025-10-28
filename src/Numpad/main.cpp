@@ -19,11 +19,22 @@
 
 
 #include "NumpadManager.h"
+#include "SingleInstanceGuard.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
-  QApplication app(argc, argv); 
-  NumpadManager numpadManager;  
+  QApplication app(argc, argv);
+
+  SingleInstanceGuard instanceGuard(QStringLiteral("VirtualNumpadInstance"));
+  if (!instanceGuard.tryToRun())
+  {
+    instanceGuard.notifyExistingInstance();
+    return 0;
+  }
+
+  NumpadManager numpadManager;
+  QObject::connect(&instanceGuard, &SingleInstanceGuard::activationRequested,
+                   &numpadManager, &NumpadManager::bringToForeground);
   return app.exec();
-}  
+}

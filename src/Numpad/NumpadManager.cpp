@@ -885,6 +885,36 @@ void NumpadManager::applyInitialPosition(const QPoint &pos)
     pm_numpad->move(validated);
 }
 
+void NumpadManager::bringToForeground()
+{
+    if (!pm_numpad)
+    {
+        return;
+    }
+
+    if (pm_numpadMenu && pm_numpadMenu->isVisible())
+    {
+        pm_numpadMenu->hide();
+    }
+
+    pm_numpad->unsetNoActivateStyle();
+
+    if (!pm_numpad->isVisible())
+    {
+        pm_numpad->show();
+    }
+
+    if (pm_numpad->isMinimized())
+    {
+        pm_numpad->showNormal();
+    }
+
+    pm_numpad->raise();
+    pm_numpad->activateWindow();
+    pm_numpad->setFocus(Qt::ActiveWindowFocusReason);
+    QApplication::setActiveWindow(pm_numpad);
+}
+
 
 QPoint NumpadManager::readStoredNumpadPosition(const QPoint &fallback) const
 {
