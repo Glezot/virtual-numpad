@@ -29,12 +29,15 @@
 #include <QGroupBox>
 #include <QFontMetrics>
 #include <QPushButton>
+#include <QGridLayout>
 #include <QColor>
 #include <QColorDialog>
 #include <QFontDialog>
 #include <QFont>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QSpinBox>
+#include <QPoint>
 #include <vector>
 #include <Windows.h>
 
@@ -73,9 +76,47 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   p_horAutoRunLayout->addStretch(1);
   QGroupBox *p_autoRunGrpBox = new QGroupBox;
   p_autoRunGrpBox->setLayout(p_horAutoRunLayout);
-  
+
+  pm_rememberPositionCheckBox = new QCheckBox("Remember last window position");
+  pm_rememberPositionCheckBox->setChecked(pm_numpadManager->readRememberLastPositionFromSettings());
+
+  const QPoint initialPosition = pm_numpadManager->readInitialPositionFromSettings();
+
+  pm_initialPosXSpinBox = new QSpinBox;
+  pm_initialPosXSpinBox->setRange(-10000, 10000);
+  pm_initialPosXSpinBox->setValue(initialPosition.x());
+
+  pm_initialPosYSpinBox = new QSpinBox;
+  pm_initialPosYSpinBox->setRange(-10000, 10000);
+  pm_initialPosYSpinBox->setValue(initialPosition.y());
+
+  pm_applyPositionButton = new QPushButton("Move numpad to position");
+
+  QLabel *p_posXLbl = new QLabel("X:");
+  QLabel *p_posYLbl = new QLabel("Y:");
+
+  QGridLayout *p_positionGridLayout = new QGridLayout;
+  p_positionGridLayout->addWidget(p_posXLbl, 0, 0);
+  p_positionGridLayout->addWidget(pm_initialPosXSpinBox, 0, 1);
+  p_positionGridLayout->addWidget(p_posYLbl, 1, 0);
+  p_positionGridLayout->addWidget(pm_initialPosYSpinBox, 1, 1);
+  p_positionGridLayout->addWidget(pm_applyPositionButton, 2, 0, 1, 2);
+
+  QVBoxLayout *p_positionLayout = new QVBoxLayout;
+  p_positionLayout->addWidget(pm_rememberPositionCheckBox);
+  p_positionLayout->addLayout(p_positionGridLayout);
+
+  QGroupBox *p_positionGroupBox = new QGroupBox;
+  p_positionGroupBox->setTitle("Window position");
+  p_positionGroupBox->setLayout(p_positionLayout);
+
+  const bool rememberPosition = pm_rememberPositionCheckBox->isChecked();
+  pm_initialPosXSpinBox->setEnabled(!rememberPosition);
+  pm_initialPosYSpinBox->setEnabled(!rememberPosition);
+  pm_applyPositionButton->setEnabled(!rememberPosition);
+
   QLabel *p_keyLbl = new QLabel("Key for show/hide numpad: ");
-  
+
   QComboBox *p_keysComboBox = new QComboBox;
   std::vector<ShowHideKey *> keys = pm_numpadManager->getShowHideKeysInfo();
   std::vector<ShowHideKey *>::iterator iter = keys.begin();
@@ -182,8 +223,9 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   p_mainLayout->addWidget(p_showGearGrpBox);
   p_mainLayout->addWidget(p_layoutBtnGrpBox);
   p_mainLayout->addWidget(p_autoRunGrpBox);
+  p_mainLayout->addWidget(p_positionGroupBox);
   p_mainLayout->addWidget(p_keyGroupBox);
-  p_mainLayout->addWidget(p_sizesGrpBox); 
+  p_mainLayout->addWidget(p_sizesGrpBox);
  // p_mainLayout->addWidget(p_altCodeLblModeGrpBox);
   p_mainLayout->addWidget(p_confGrpBox);
   p_mainLayout->addWidget(p_fontGrpBox);
@@ -215,6 +257,14 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
           SLOT(slot_showLayoutBtnStateChanged(int)));
   connect(p_openConfFileFolderBtn, SIGNAL(clicked()), SLOT(slot_openConfFileClicked()));
   connect(p_loadOtherConfBtn, SIGNAL(clicked()), SLOT(slot_loadOtherConfBtnClicked()));
+  connect(pm_rememberPositionCheckBox, SIGNAL(stateChanged(int)),
+          SLOT(slot_rememberPositionStateChanged(int)));
+  connect(pm_initialPosXSpinBox, SIGNAL(valueChanged(int)),
+          SLOT(slot_customPositionValueChanged(int)));
+  connect(pm_initialPosYSpinBox, SIGNAL(valueChanged(int)),
+          SLOT(slot_customPositionValueChanged(int)));
+  connect(pm_applyPositionButton, SIGNAL(clicked()),
+          SLOT(slot_applyCustomPositionClicked()));
 
   setFixedSize(sizeHint());
 
@@ -396,5 +446,38 @@ void SettingsDialog::slot_showLayoutBtnStateChanged(int state)
 void SettingsDialog::slot_openConfFileClicked()
 {
     pm_numpadManager->openConfFileFolder();
+}
+
+
+void SettingsDialog::slot_rememberPositionStateChanged(int state)
+{
+    const bool remember = (state == Qt::Checked);
+    pm_numpadManager->writeRememberLastPositionToSettings(remember);
+
+    pm_initialPosXSpinBox->setEnabled(!remember);
+    pm_initialPosYSpinBox->setEnabled(!remember);
+    pm_applyPositionButton->setEnabled(!remember);
+
+    pm_numpadManager->applyInitialPosition(pm_numpadManager->readNumpadPosition());
+}
+
+
+void SettingsDialog::slot_customPositionValueChanged(int value)
+{
+    Q_UNUSED(value);
+    const QPoint pos(pm_initialPosXSpinBox->value(), pm_initialPosYSpinBox->value());
+    pm_numpadManager->writeInitialPositionToSettings(pos);
+
+    if (!pm_rememberPositionCheckBox->isChecked())
+    {
+        pm_numpadManager->applyInitialPosition(pos);
+    }
+}
+
+
+void SettingsDialog::slot_applyCustomPositionClicked()
+{
+    const QPoint pos(pm_initialPosXSpinBox->value(), pm_initialPosYSpinBox->value());
+    pm_numpadManager->applyInitialPosition(pos);
 }
 

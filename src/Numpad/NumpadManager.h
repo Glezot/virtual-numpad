@@ -87,6 +87,11 @@ public:
   void toggleLayout();
   void writeNumpadPosition(const QPoint &pos);
   QPoint readNumpadPosition() const;
+  bool readRememberLastPositionFromSettings() const;
+  void writeRememberLastPositionToSettings(bool remember);
+  QPoint readInitialPositionFromSettings() const;
+  void writeInitialPositionToSettings(const QPoint &pos);
+  void applyInitialPosition(const QPoint &pos);
 
 protected:
   // The method for processing native events from the OS in Qt
@@ -121,6 +126,8 @@ private:
   QList<BtnDynamicInfo *> readBtnsDynamicInfo(QString);
   QList<BtnDynamicInfo *> loadStandardNmpdInfo();
   int getVirtCode(int);
+  QPoint readStoredNumpadPosition(const QPoint &fallback) const;
+  QPoint validatePosition(const QPoint &candidate, const QPoint &fallback) const;
 
   Numpad *pm_numpad;
   QSystemTrayIcon *pm_systemTray;  
