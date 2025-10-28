@@ -613,20 +613,9 @@ void Numpad::initAltCodesList()
 
 void Numpad::closeEvent(QCloseEvent *ce)
 {
-    if (allowClose)
-      return;
-
-    ce->ignore();
-    if (m_lastFocusWindow == (HWND)winId())
-    {
-        if (loseFocus())
-        {
-            setNoActivateStyle();
-            return;
-        }
-    }
+    allowClose = true;
     unsetNoActivateStyle();
-    this->hide();
+    QWidget::closeEvent(ce);
 }
 
 
