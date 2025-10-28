@@ -26,7 +26,7 @@
 class Numpad;
 class NumpadManager;
 class QCheckBox;
-class QSpinBox;
+class QLineEdit;
 class QPushButton;
 
 class SettingsDialog : public QWidget
@@ -57,16 +57,18 @@ protected slots:
   void slot_openConfFileClicked();
   void slot_loadOtherConfBtnClicked();
   void slot_rememberPositionStateChanged(int state);
-  void slot_customPositionValueChanged(int value);
+  void slot_customPositionEditingFinished();
+  void slot_pickCurrentPositionClicked();
   void slot_applyCustomPositionClicked();
 
 private:
   NumpadManager *pm_numpadManager;
   Numpad *pm_numpad;
   QCheckBox *pm_rememberPositionCheckBox;
-  QSpinBox *pm_initialPosXSpinBox;
-  QSpinBox *pm_initialPosYSpinBox;
+  QLineEdit *pm_initialPosXLineEdit;
+  QLineEdit *pm_initialPosYLineEdit;
   QPushButton *pm_applyPositionButton;
+  QPushButton *pm_pickCurrentPositionButton;
 };
 
 #endif

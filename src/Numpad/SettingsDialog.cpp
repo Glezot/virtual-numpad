@@ -36,11 +36,35 @@
 #include <QFont>
 #include <QComboBox>
 #include <QCheckBox>
-#include <QSpinBox>
+#include <QLineEdit>
+#include <QIntValidator>
 #include <QPoint>
+#include <QString>
 #include <vector>
 #include <Windows.h>
 
+
+namespace
+{
+int parsePositionValue(QLineEdit *lineEdit, int fallback)
+{
+    if (!lineEdit)
+    {
+        return fallback;
+    }
+
+    bool ok = false;
+    const int value = lineEdit->text().toInt(&ok);
+    if (!ok)
+    {
+        lineEdit->setText(QString::number(fallback));
+        return fallback;
+    }
+
+    lineEdit->setText(QString::number(value));
+    return value;
+}
+}
 
 SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
                                int initBtnSize, int initSpacing, QWidget *p_wid/*= 0*/)
@@ -82,25 +106,27 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
 
   const QPoint initialPosition = pm_numpadManager->readInitialPositionFromSettings();
 
-  pm_initialPosXSpinBox = new QSpinBox;
-  pm_initialPosXSpinBox->setRange(-10000, 10000);
-  pm_initialPosXSpinBox->setValue(initialPosition.x());
+  pm_initialPosXLineEdit = new QLineEdit;
+  pm_initialPosXLineEdit->setValidator(new QIntValidator(-10000, 10000, pm_initialPosXLineEdit));
+  pm_initialPosXLineEdit->setText(QString::number(initialPosition.x()));
 
-  pm_initialPosYSpinBox = new QSpinBox;
-  pm_initialPosYSpinBox->setRange(-10000, 10000);
-  pm_initialPosYSpinBox->setValue(initialPosition.y());
+  pm_initialPosYLineEdit = new QLineEdit;
+  pm_initialPosYLineEdit->setValidator(new QIntValidator(-10000, 10000, pm_initialPosYLineEdit));
+  pm_initialPosYLineEdit->setText(QString::number(initialPosition.y()));
 
   pm_applyPositionButton = new QPushButton("Move numpad to position");
+  pm_pickCurrentPositionButton = new QPushButton("Use current position");
 
   QLabel *p_posXLbl = new QLabel("X:");
   QLabel *p_posYLbl = new QLabel("Y:");
 
   QGridLayout *p_positionGridLayout = new QGridLayout;
   p_positionGridLayout->addWidget(p_posXLbl, 0, 0);
-  p_positionGridLayout->addWidget(pm_initialPosXSpinBox, 0, 1);
+  p_positionGridLayout->addWidget(pm_initialPosXLineEdit, 0, 1);
   p_positionGridLayout->addWidget(p_posYLbl, 1, 0);
-  p_positionGridLayout->addWidget(pm_initialPosYSpinBox, 1, 1);
-  p_positionGridLayout->addWidget(pm_applyPositionButton, 2, 0, 1, 2);
+  p_positionGridLayout->addWidget(pm_initialPosYLineEdit, 1, 1);
+  p_positionGridLayout->addWidget(pm_pickCurrentPositionButton, 2, 0, 1, 2);
+  p_positionGridLayout->addWidget(pm_applyPositionButton, 3, 0, 1, 2);
 
   QVBoxLayout *p_positionLayout = new QVBoxLayout;
   p_positionLayout->addWidget(pm_rememberPositionCheckBox);
@@ -111,9 +137,10 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   p_positionGroupBox->setLayout(p_positionLayout);
 
   const bool rememberPosition = pm_rememberPositionCheckBox->isChecked();
-  pm_initialPosXSpinBox->setEnabled(!rememberPosition);
-  pm_initialPosYSpinBox->setEnabled(!rememberPosition);
+  pm_initialPosXLineEdit->setEnabled(!rememberPosition);
+  pm_initialPosYLineEdit->setEnabled(!rememberPosition);
   pm_applyPositionButton->setEnabled(!rememberPosition);
+  pm_pickCurrentPositionButton->setEnabled(!rememberPosition);
 
   QLabel *p_keyLbl = new QLabel("Key for show/hide numpad: ");
 
@@ -259,10 +286,12 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   connect(p_loadOtherConfBtn, SIGNAL(clicked()), SLOT(slot_loadOtherConfBtnClicked()));
   connect(pm_rememberPositionCheckBox, SIGNAL(stateChanged(int)),
           SLOT(slot_rememberPositionStateChanged(int)));
-  connect(pm_initialPosXSpinBox, SIGNAL(valueChanged(int)),
-          SLOT(slot_customPositionValueChanged(int)));
-  connect(pm_initialPosYSpinBox, SIGNAL(valueChanged(int)),
-          SLOT(slot_customPositionValueChanged(int)));
+  connect(pm_initialPosXLineEdit, SIGNAL(editingFinished()),
+          SLOT(slot_customPositionEditingFinished()));
+  connect(pm_initialPosYLineEdit, SIGNAL(editingFinished()),
+          SLOT(slot_customPositionEditingFinished()));
+  connect(pm_pickCurrentPositionButton, SIGNAL(clicked()),
+          SLOT(slot_pickCurrentPositionClicked()));
   connect(pm_applyPositionButton, SIGNAL(clicked()),
           SLOT(slot_applyCustomPositionClicked()));
 
@@ -454,18 +483,20 @@ void SettingsDialog::slot_rememberPositionStateChanged(int state)
     const bool remember = (state == Qt::Checked);
     pm_numpadManager->writeRememberLastPositionToSettings(remember);
 
-    pm_initialPosXSpinBox->setEnabled(!remember);
-    pm_initialPosYSpinBox->setEnabled(!remember);
+    pm_initialPosXLineEdit->setEnabled(!remember);
+    pm_initialPosYLineEdit->setEnabled(!remember);
     pm_applyPositionButton->setEnabled(!remember);
+    pm_pickCurrentPositionButton->setEnabled(!remember);
 
     pm_numpadManager->applyInitialPosition(pm_numpadManager->readNumpadPosition());
 }
 
 
-void SettingsDialog::slot_customPositionValueChanged(int value)
+void SettingsDialog::slot_customPositionEditingFinished()
 {
-    Q_UNUSED(value);
-    const QPoint pos(pm_initialPosXSpinBox->value(), pm_initialPosYSpinBox->value());
+    const QPoint fallback = pm_numpadManager->readInitialPositionFromSettings();
+    const QPoint pos(parsePositionValue(pm_initialPosXLineEdit, fallback.x()),
+                     parsePositionValue(pm_initialPosYLineEdit, fallback.y()));
     pm_numpadManager->writeInitialPositionToSettings(pos);
 
     if (!pm_rememberPositionCheckBox->isChecked())
@@ -475,9 +506,26 @@ void SettingsDialog::slot_customPositionValueChanged(int value)
 }
 
 
+void SettingsDialog::slot_pickCurrentPositionClicked()
+{
+    if (!pm_numpad)
+    {
+        return;
+    }
+
+    const QPoint currentPos = pm_numpad->pos();
+    pm_initialPosXLineEdit->setText(QString::number(currentPos.x()));
+    pm_initialPosYLineEdit->setText(QString::number(currentPos.y()));
+
+    slot_customPositionEditingFinished();
+}
+
+
 void SettingsDialog::slot_applyCustomPositionClicked()
 {
-    const QPoint pos(pm_initialPosXSpinBox->value(), pm_initialPosYSpinBox->value());
+    const QPoint fallback = pm_numpadManager->readInitialPositionFromSettings();
+    const QPoint pos(parsePositionValue(pm_initialPosXLineEdit, fallback.x()),
+                     parsePositionValue(pm_initialPosYLineEdit, fallback.y()));
     pm_numpadManager->applyInitialPosition(pos);
 }
 
