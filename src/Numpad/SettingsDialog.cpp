@@ -160,9 +160,10 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   p_keyLayout->addWidget(p_keyLbl);
   p_keyLayout->addWidget(p_keysComboBox);
   p_keyLayout->addStretch(1);
-  QGroupBox *p_keyGroupBox = new QGroupBox;
+  QGroupBox *p_keyGroupBox = new QGroupBox(this);
   p_keyGroupBox->setLayout(p_keyLayout);
   p_keyGroupBox->setEnabled(pm_numpadManager->keyboardHookIsSetGood());
+  p_keyGroupBox->hide();
   
   QLabel *p_buttonsSizeLbl = new QLabel("Buttons size");
   QSlider *p_buttonsSizeSlider = new QSlider(Qt::Horizontal); 
@@ -251,7 +252,6 @@ SettingsDialog::SettingsDialog(NumpadManager *p_numpadManager, Numpad *p_numpad,
   p_mainLayout->addWidget(p_layoutBtnGrpBox);
   p_mainLayout->addWidget(p_autoRunGrpBox);
   p_mainLayout->addWidget(p_positionGroupBox);
-  p_mainLayout->addWidget(p_keyGroupBox);
   p_mainLayout->addWidget(p_sizesGrpBox);
  // p_mainLayout->addWidget(p_altCodeLblModeGrpBox);
   p_mainLayout->addWidget(p_confGrpBox);
@@ -482,6 +482,11 @@ void SettingsDialog::slot_rememberPositionStateChanged(int state)
 {
     const bool remember = (state == Qt::Checked);
     pm_numpadManager->writeRememberLastPositionToSettings(remember);
+
+    if (remember && pm_numpad)
+    {
+        pm_numpadManager->writeNumpadPosition(pm_numpad->pos());
+    }
 
     pm_initialPosXLineEdit->setEnabled(!remember);
     pm_initialPosYLineEdit->setEnabled(!remember);

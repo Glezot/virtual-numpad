@@ -818,15 +818,28 @@ void NumpadManager::writeNumpadPosition(const QPoint &pos)
 
 QPoint NumpadManager::readNumpadPosition() const
 {
+    if (pm_settings)
+    {
+        pm_settings->sync();
+    }
+
     const int defaultCoord = 200;
     const QPoint defaultPoint(defaultCoord, defaultCoord);
-    const QPoint stored = readStoredNumpadPosition(defaultPoint);
     const QPoint custom = readInitialPositionFromSettings();
+    const QPoint stored = readStoredNumpadPosition(defaultPoint);
     const bool rememberLast = readRememberLastPositionFromSettings();
-    const QPoint candidate = rememberLast ? stored : custom;
-    const QPoint fallback = rememberLast ? custom : stored;
 
-    return validatePosition(candidate, fallback);
+    if (!rememberLast)
+    {
+        return validatePosition(custom, stored);
+    }
+
+    if (hasStoredNumpadPosition())
+    {
+        return validatePosition(stored, custom);
+    }
+
+    return validatePosition(custom, stored);
 }
 
 
@@ -875,8 +888,25 @@ void NumpadManager::applyInitialPosition(const QPoint &pos)
 
 QPoint NumpadManager::readStoredNumpadPosition(const QPoint &fallback) const
 {
-    return QPoint(pm_settings->value("/Settings/xPr", fallback.x()).toInt(),
-                  pm_settings->value("/Settings/yPr", fallback.y()).toInt());
+    if (!hasStoredNumpadPosition())
+    {
+        return fallback;
+    }
+
+    return QPoint(pm_settings->value("/Settings/xPr").toInt(),
+                  pm_settings->value("/Settings/yPr").toInt());
+}
+
+
+bool NumpadManager::hasStoredNumpadPosition() const
+{
+    if (!pm_settings)
+    {
+        return false;
+    }
+
+    return pm_settings->contains("/Settings/xPr") &&
+           pm_settings->contains("/Settings/yPr");
 }
 
 
