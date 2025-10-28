@@ -110,11 +110,14 @@ protected slots:
 
 private:
   void createNumpad();
-  void createSystemTray();  
+  void createSystemTray();
   void readSizeFromSettings();
-  QString readKeyFromSettings();  
+  QString readKeyFromSettings();
   QFont readFontFromSettings();
   bool readAltCodeLblMode();
+  void registerCustomUrlProtocol();
+  void handleCommandLineArguments();
+  void processProtocolCommand(const QString &command);
   void showHideNumpadThroPressKey();
   void showNewNumpad();
   void loseFocus();

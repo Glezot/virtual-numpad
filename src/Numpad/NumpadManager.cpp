@@ -39,6 +39,8 @@
 #include <QSettings>
 #include <QAction>
 #include <QDir>
+#include <QCoreApplication>
+#include <QStringList>
 #include <QRegularExpression>
 #include <QTimer>
 #include <QApplication>
@@ -95,6 +97,8 @@ NumpadManager::NumpadManager(QWidget *p_parent/*= 0*/)
   pm_autoRunSettings = new QSettings ("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\"
                      "CurrentVersion\\Run", QSettings::NativeFormat, this);
 
+  registerCustomUrlProtocol();
+
   createSystemTray();
   createNumpadMenu();
 
@@ -149,7 +153,9 @@ NumpadManager::NumpadManager(QWidget *p_parent/*= 0*/)
 
   pm_errMsgBox = NULL;
   showNewNumpad();
-}  
+
+  handleCommandLineArguments();
+}
 
 
 void NumpadManager::showNewNumpad()
@@ -1624,4 +1630,107 @@ void NumpadManager::toggleLayout()
     pm_numpad->move(newX, newY);
 }
 
+
+void NumpadManager::registerCustomUrlProtocol()
+{
+#ifdef Q_OS_WIN
+  const QString protocolName = QStringLiteral("numpad");
+  const QString baseKey = QStringLiteral("HKEY_CURRENT_USER\\Software\\Classes\\") + protocolName;
+
+  QSettings protocolSettings(baseKey, QSettings::NativeFormat);
+  const QString description = QStringLiteral("URL:Numpad Protocol");
+  if (protocolSettings.value(".").toString() != description)
+  {
+    protocolSettings.setValue(".", description);
+  }
+  if (!protocolSettings.contains("URL Protocol") ||
+      protocolSettings.value("URL Protocol").toString() != QString())
+  {
+    protocolSettings.setValue("URL Protocol", QString());
+  }
+
+  const QString applicationPath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
+  const QString commandKey = baseKey + QStringLiteral("\\shell\\open\\command");
+  QSettings commandSettings(commandKey, QSettings::NativeFormat);
+  const QString commandValue = QString("\"%1\" \"%%1\"").arg(applicationPath);
+  if (commandSettings.value(".").toString() != commandValue)
+  {
+    commandSettings.setValue(".", commandValue);
+  }
+
+  const QString iconKey = baseKey + QStringLiteral("\\DefaultIcon");
+  QSettings iconSettings(iconKey, QSettings::NativeFormat);
+  const QString iconValue = QString("\"%1\",0").arg(applicationPath);
+  if (iconSettings.value(".").toString() != iconValue)
+  {
+    iconSettings.setValue(".", iconValue);
+  }
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void NumpadManager::handleCommandLineArguments()
+{
+#ifdef Q_OS_WIN
+  const QStringList args = QCoreApplication::arguments();
+  for (int i = 1; i < args.size(); ++i)
+  {
+    const QString argument = args.at(i);
+    if (!argument.startsWith("numpad:", Qt::CaseInsensitive))
+    {
+      continue;
+    }
+
+    QUrl url(argument);
+    QString command = url.path();
+    if (command.startsWith('/'))
+    {
+      command.remove(0, 1);
+    }
+    if (command.isEmpty())
+    {
+      command = url.host();
+    }
+    if (command.isEmpty())
+    {
+      command = argument.mid(argument.indexOf(QLatin1Char(':')) + 1);
+    }
+
+    processProtocolCommand(command);
+  }
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void NumpadManager::processProtocolCommand(const QString &command)
+{
+#ifdef Q_OS_WIN
+  QString normalizedCommand = command;
+  int queryIndex = normalizedCommand.indexOf(QLatin1Char('?'));
+  if (queryIndex > -1)
+  {
+    normalizedCommand = normalizedCommand.left(queryIndex);
+  }
+  normalizedCommand = normalizedCommand.trimmed();
+
+  if (normalizedCommand.compare(QStringLiteral("init"), Qt::CaseInsensitive) == 0)
+  {
+    if (!pm_numpad->isVisible())
+    {
+      pm_numpad->setNoActivateStyle();
+      pm_numpad->show();
+    }
+    else if (pm_numpad->isMinimized())
+    {
+      pm_numpad->showNormal();
+    }
+    pm_numpad->raise();
+    pm_numpad->activateWindow();
+  }
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
