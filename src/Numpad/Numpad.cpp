@@ -38,7 +38,11 @@
 #include <QFile>
 #include <QString>
 #include <QSet>
+#include <QtGlobal>
 #include <WindowsX.h>
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#endif
 #include <QMenuBar>
 #include <QAction>
 #include <QIcon>
@@ -50,12 +54,20 @@
 #pragma comment(lib,"user32.lib")
 
 Numpad::Numpad(NumpadManager *_nm, QWidget *p_wid/*= 0*/)
-: QWidget(p_wid, Qt::WindowTitleHint | Qt::WindowStaysOnTopHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
+: QWidget(p_wid, Qt::WindowTitleHint | Qt::WindowStaysOnTopHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint)
 {
-    nm = _nm;    
+    nm = _nm;
   srand(time(0));
 
-  setWindowTitle("Numpad"); 
+  setWindowTitle("Numpad");
+
+#ifdef Q_OS_WIN
+  HWND hwnd = reinterpret_cast<HWND>(winId());
+  LONG styles = GetWindowLong(hwnd, GWL_EXSTYLE);
+  styles |= WS_EX_APPWINDOW;
+  styles &= ~WS_EX_TOOLWINDOW;
+  SetWindowLong(hwnd, GWL_EXSTYLE, styles);
+#endif
 
   pm_gridLayout = new QGridLayout; 
 
