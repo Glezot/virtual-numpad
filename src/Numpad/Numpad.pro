@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = Numpad_1.9.0
+TARGET = Numpad_1.9.1
 DEPENDPATH += . Buttons
 INCLUDEPATH += . Buttons
 
