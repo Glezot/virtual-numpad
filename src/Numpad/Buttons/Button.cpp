@@ -20,11 +20,13 @@
 
 #include "Buttons/Button.h"
 #include <QString>
+#include <QEvent>
 
 
 Button::Button(const QString &text, QList<int> _ids, QWidget *p_wid/*= 0*/)
 : QLabel(text, p_wid)
-{    
+{
+    setAttribute(Qt::WA_AcceptTouchEvents, true);
     setNotPressedView();
     setCheckable(false);
     m_autoRepeated = false;
@@ -33,6 +35,7 @@ Button::Button(const QString &text, QList<int> _ids, QWidget *p_wid/*= 0*/)
     pm_delayTimer = NULL;
     pm_intervalTimer = NULL;
     m_ids = _ids;
+    m_pressed = false;
 }
 
 Button::~Button()
@@ -112,7 +115,7 @@ void Button::mouseReleaseEvent(QMouseEvent *)
     m_pressed = false;
     if (!m_checkable)
     {
-        setNotPressedView();        
+        setNotPressedView();
     }
     else
     {
@@ -128,6 +131,61 @@ void Button::mouseReleaseEvent(QMouseEvent *)
         pm_delayTimer->stop();
         pm_intervalTimer->stop();
     }
+}
+
+bool Button::event(QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::TouchBegin:
+        event->accept();
+        setPressedView();
+        m_pressed = true;
+        if (m_autoRepeated && pm_delayTimer)
+        {
+            pm_delayTimer->start(m_autoRepeatDelay);
+        }
+        emit pressed(m_ids);
+        return true;
+    case QEvent::TouchEnd:
+        event->accept();
+        m_pressed = false;
+        if (!m_checkable)
+        {
+            setNotPressedView();
+        }
+        else
+        {
+            m_checked = !m_checked;
+            if (!m_checked)
+            {
+                setNotPressedView();
+            }
+            emit toggled(m_ids[0], m_checked);
+        }
+        if (m_autoRepeated)
+        {
+            pm_delayTimer->stop();
+            pm_intervalTimer->stop();
+        }
+        return true;
+    case QEvent::TouchCancel:
+        event->accept();
+        m_pressed = false;
+        if (!m_checkable || !m_checked)
+        {
+            setNotPressedView();
+        }
+        if (m_autoRepeated)
+        {
+            pm_delayTimer->stop();
+            pm_intervalTimer->stop();
+        }
+        return true;
+    default:
+        break;
+    }
+    return QLabel::event(event);
 }
 
 

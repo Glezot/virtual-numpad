@@ -26,6 +26,7 @@
 #include <QList>
 
 class QString;
+class QEvent;
 
 class Button : public QLabel
 {
@@ -68,6 +69,7 @@ private:
 protected:
   void mousePressEvent(QMouseEvent *);
   void mouseReleaseEvent(QMouseEvent *);
+  bool event(QEvent *) override;
 protected slots:
   void intervalTimeout();
   void delayTimeout();
