@@ -98,8 +98,13 @@ void Button::setStyles()
 }
 
 
-void Button::mousePressEvent(QMouseEvent *)
+void Button::mousePressEvent(QMouseEvent *event)
 {
+    if (event->source() == Qt::MouseEventSynthesizedByQt)
+    {
+        event->ignore();
+        return;
+    }
     setPressedView();
     m_pressed = true;
     if (m_autoRepeated && pm_delayTimer)
@@ -110,8 +115,13 @@ void Button::mousePressEvent(QMouseEvent *)
 }
 
 
-void Button::mouseReleaseEvent(QMouseEvent *)
+void Button::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (event->source() == Qt::MouseEventSynthesizedByQt)
+    {
+        event->ignore();
+        return;
+    }
     m_pressed = false;
     if (!m_checkable)
     {

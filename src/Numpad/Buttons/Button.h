@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QTimer>
 #include <QList>
+#include <QMouseEvent>
 
 class QString;
 class QEvent;
@@ -67,8 +68,8 @@ private:
   QList<int> m_ids;
 
 protected:
-  void mousePressEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
   bool event(QEvent *) override;
 protected slots:
   void intervalTimeout();
