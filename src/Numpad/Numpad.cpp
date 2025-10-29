@@ -616,6 +616,11 @@ void Numpad::closeEvent(QCloseEvent *ce)
     allowClose = true;
     unsetNoActivateStyle();
     QWidget::closeEvent(ce);
+
+    if (ce->isAccepted())
+    {
+        qApp->quit();
+    }
 }
 
 
