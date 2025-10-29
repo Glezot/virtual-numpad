@@ -100,7 +100,7 @@ void Button::setStyles()
 
 void Button::mousePressEvent(QMouseEvent *event)
 {
-    if (event->source() == Qt::MouseEventSynthesizedByQt)
+    if (event->source() != Qt::MouseEventNotSynthesized)
     {
         event->ignore();
         return;
@@ -117,7 +117,7 @@ void Button::mousePressEvent(QMouseEvent *event)
 
 void Button::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->source() == Qt::MouseEventSynthesizedByQt)
+    if (event->source() != Qt::MouseEventNotSynthesized)
     {
         event->ignore();
         return;
